@@ -48,7 +48,7 @@ if [ -n "${YSE_ARCH:-}" ]; then ARCH="$YSE_ARCH"; else
 fi
 ent_arch(){ case "$ARCH" in aarch64) echo aarch64-k3.10 ;; armv7) echo armv7sf-k3.2 ;; *) echo "" ;; esac; }
 ent_ready(){ [ -x "$OPKG" ]; }
-opkg(){ PATH="$OPT/bin:$OPT/sbin:$PATH" LD_LIBRARY_PATH="$OPT/lib" "$OPKG" "$@"; }
+opkg(){ PATH="$OPT/bin:$OPT/sbin:$PATH" "$OPKG" "$@"; }
 
 # ---------- утилиты ----------
 msg(){ echo "[yse] $*"; }
@@ -62,13 +62,13 @@ rootfs_ro(){ awk '$2=="/"{print $4}' /proc/mounts | grep -q '^ro'; }  # busybox 
 fetch_https(){
     need_ent
     if [ -x "$OPT/bin/curl" ]; then
-        LD_LIBRARY_PATH="$OPT/lib" "$OPT/bin/curl" -fsSL --retry 2 -o "$2" "$1"
+        "$OPT/bin/curl" -fsSL --retry 2 -o "$2" "$1"
     elif [ -x "$OPT/bin/wget" ]; then
-        LD_LIBRARY_PATH="$OPT/lib" "$OPT/bin/wget" -q -O "$2" "$1"
+        "$OPT/bin/wget" -q -O "$2" "$1"
     else
         msg "для загрузки с GitHub нужен curl — ставлю из Entware"
         opkg install curl >/dev/null 2>&1 && [ -x "$OPT/bin/curl" ] || die "не удалось поставить curl (yse install curl)"
-        LD_LIBRARY_PATH="$OPT/lib" "$OPT/bin/curl" -fsSL --retry 2 -o "$2" "$1"
+        "$OPT/bin/curl" -fsSL --retry 2 -o "$2" "$1"
     fi
 }
 
